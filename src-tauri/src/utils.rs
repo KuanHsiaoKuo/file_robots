@@ -57,6 +57,7 @@ pub fn open_file_path_in_terminal(path: &str) {
     } else {
         arg = curr_path.parent().unwrap().to_str().unwrap();
     }
+    println!("open_file_path_in_terminal: {}", arg);
 
     if cfg!(target_os = "windows") {
         //cmd /K "cd C:\Windows\"
