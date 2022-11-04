@@ -8,7 +8,6 @@ import copy from "copy-to-clipboard";
 import {excel_automation, open_file_location_in_terminal} from "./utils";
 import {Marker} from "react-mark.js";
 import {useTranslation} from "react-i18next";
-
 initializeFileTypeIcons(undefined);
 
 

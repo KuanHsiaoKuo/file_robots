@@ -64,6 +64,9 @@
         "removeFile": true,
         "renameFile": true,
         "writeFile": true
+      },
+      "notification": {
+        "all": true
       }
     },
     "windows": [

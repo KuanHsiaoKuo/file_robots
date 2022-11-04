@@ -1,4 +1,5 @@
 import {invoke} from "@tauri-apps/api";
+import {isPermissionGranted, requestPermission, sendNotification} from "@tauri-apps/api/notification";
 
 const fileType2ext = {
     4: "bmp jpg gif png jpeg",
@@ -35,8 +36,17 @@ export function open_file_location_in_terminal(row) {
     });
 }
 
-export function excel_automation(row) {
-    let _ = invoke('excel_automation_backend', {
+export async function excel_automation(row) {
+    let permissionGranted = await isPermissionGranted();
+    if (!permissionGranted) {
+        const permission = await requestPermission();
+        permissionGranted = permission === 'granted';
+    }
+    if (permissionGranted) {
+        sendNotification('Tauri is awesome!');
+        sendNotification({ title: 'TAURI', body: 'Tauri is awesome!' });
+    }
+    return await invoke('excel_automation_backend', {
         // kw: row.abs_path
         filePath: row.abs_path
     });
