@@ -65,7 +65,7 @@ let _ = i18n
                     "all":"所有",
                     "photo":"图片",
                     "video":"视频",
-                    "document":"文档",
+                    "document":"EXCEL文档",
                     "folder":"文件夹",
                     "name":"名称",
                     "last-modified":"上次修改",

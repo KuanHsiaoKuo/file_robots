@@ -224,7 +224,7 @@ const Tab = ({setSelectedKey, selectedKey, kw, setItems,setTheme,theme,lang,setL
                 {/*</PivotItem>*/}
                 {/*<PivotItem headerText={t("folder")} itemIcon="FabricFolder" itemKey="1">*/}
                 {/*</PivotItem>*/}
-                <PivotItem headerText={t("document")} itemIcon="Document" itemKey="2">
+                <PivotItem headerText={t("document")} itemIcon="Document" itemKey="5">
                 </PivotItem>
                 {/*<PivotItem headerText={t("video")} itemIcon="Video" itemKey="3">*/}
                 {/*</PivotItem>*/}

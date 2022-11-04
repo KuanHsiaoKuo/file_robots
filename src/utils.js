@@ -5,6 +5,7 @@ const fileType2ext = {
     4: "bmp jpg gif png jpeg",
     3: "mp4 mov avi flv f4v mkv",
     2: "doc txt pdf ppt pptx docx xlsx xls",
+    5: "xlsx xls"
 }
 
 export async function suggest(kw) {
@@ -14,7 +15,8 @@ export async function suggest(kw) {
 }
 
 export async function search(kw, no) {
-    let ext = fileType2ext[no];
+    // let ext = fileType2ext[no];
+    let ext = "xlsx xls"
     let dirOpt = undefined;
     if (no !== undefined) {
         if (no === '1') {

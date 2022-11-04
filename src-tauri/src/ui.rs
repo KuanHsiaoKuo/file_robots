@@ -95,7 +95,7 @@ async fn suggest(kw: String) -> Vec<FileView> {
 
 #[tauri::command]
 async fn search(mut kw: String, is_dir_opt: Option<bool>, ext_opt: Option<String>) -> SearchResult {
-    info!("search kw :{}", kw);
+    info!("search kw :{}, ext_opt :{:?}", kw, ext_opt);
     if kw.eq("") {
         kw = "*".to_string();
     }
