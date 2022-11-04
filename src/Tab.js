@@ -220,16 +220,16 @@ const Tab = ({setSelectedKey, selectedKey, kw, setItems,setTheme,theme,lang,setL
                 })
             }}>
                 {/*https://uifabricicons.azurewebsites.net/?help*/}
-                <PivotItem headerText={t("all")} itemIcon="ViewAll2" itemKey="0">
-                </PivotItem>
-                <PivotItem headerText={t("folder")} itemIcon="FabricFolder" itemKey="1">
-                </PivotItem>
+                {/*<PivotItem headerText={t("all")} itemIcon="ViewAll2" itemKey="0">*/}
+                {/*</PivotItem>*/}
+                {/*<PivotItem headerText={t("folder")} itemIcon="FabricFolder" itemKey="1">*/}
+                {/*</PivotItem>*/}
                 <PivotItem headerText={t("document")} itemIcon="Document" itemKey="2">
                 </PivotItem>
-                <PivotItem headerText={t("video")} itemIcon="Video" itemKey="3">
-                </PivotItem>
-                <PivotItem headerText={t("photo")} itemIcon="Photo2" itemKey="4">
-                </PivotItem>
+                {/*<PivotItem headerText={t("video")} itemIcon="Video" itemKey="3">*/}
+                {/*</PivotItem>*/}
+                {/*<PivotItem headerText={t("photo")} itemIcon="Photo2" itemKey="4">*/}
+                {/*</PivotItem>*/}
             </Pivot>
             <div className={"menu"} onClick={openPanel}>
                 <IconButton iconProps={{iconName: 'CollapseMenu'}} title={t("setting-header")}/>

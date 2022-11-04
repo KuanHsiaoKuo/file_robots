@@ -70,7 +70,7 @@
       {
         "skipTaskbar": false,
         "center": true,
-        "title": "财务RPA机器人",
+        "title": "财务EXCEL机器人",
         "width": 900,
         "height": 600,
         "resizable": true,
