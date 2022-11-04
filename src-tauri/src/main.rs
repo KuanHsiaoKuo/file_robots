@@ -17,6 +17,8 @@ mod utils;
 mod walk_exec;
 mod walk_metrics;
 mod watch_exec;
+mod excel_operator;
+
 #[macro_use]
 extern crate lazy_static;
 

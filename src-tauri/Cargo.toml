@@ -16,6 +16,7 @@ tauri-build = { version = "1.0.0-rc.4", features = [] }
 winres = "0.1"
 
 [dependencies]
+xlsxwriter = "0.4.0"
 log4rs = "0.10.0"
 log = { version = "0.4", features = ["std", "serde"] }
 chrono = "0.4.19"
@@ -58,3 +59,7 @@ custom-protocol = [ "tauri/custom-protocol" ]
 
 [profile.test]
 opt-level=3
+
+exclude = [
+    "examples"
+]
