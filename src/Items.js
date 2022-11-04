@@ -12,7 +12,7 @@ import {useTranslation} from "react-i18next";
 initializeFileTypeIcons(undefined);
 
 
-function Items({kw,items, tokenized,setItems}) {
+function Items({kw, items, tokenized, setItems}) {
 
     const {t} = useTranslation();
 
@@ -153,7 +153,7 @@ function Items({kw,items, tokenized,setItems}) {
             isPadded: true,
             onRender: (item) => {
                 return <span>
-                <Marker mark={tokenized} options={{ className: "marker" }}>
+                <Marker mark={tokenized} options={{className: "marker"}}>
        {item.name}
       </Marker>
                 </span>;
@@ -183,7 +183,7 @@ function Items({kw,items, tokenized,setItems}) {
             isCollapsible: true,
             data: "string",
             onRender: (item) => {
-                return <span>{item.is_dir?"-":bytesToSize(item.size)}</span>;
+                return <span>{item.is_dir ? "-" : bytesToSize(item.size)}</span>;
             },
             isPadded: true
         },
