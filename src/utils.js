@@ -1,5 +1,4 @@
 import {invoke} from "@tauri-apps/api";
-import i18next from "i18next";
 
 const fileType2ext = {
     4: "bmp jpg gif png jpeg",
@@ -33,6 +32,13 @@ export async function search(kw, no) {
 export function open_file_location_in_terminal(row) {
     let _ = invoke('open_file_in_terminal', {
         kw: row.abs_path
+    });
+}
+
+export function excel_automation(row) {
+    let _ = invoke('excel_automation_backend', {
+        // kw: row.abs_path
+        filePath: row.abs_path
     });
 }
 

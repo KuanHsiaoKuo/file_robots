@@ -5,7 +5,7 @@ import {FileIconType, getFileTypeIconProps, initializeFileTypeIcons} from '@flue
 import {Icon} from "office-ui-fabric-react";
 import moment from "moment";
 import copy from "copy-to-clipboard";
-import {open_file_location, open_file_location_in_terminal} from "./utils";
+import {excel_automation, open_file_location_in_terminal} from "./utils";
 import {Marker} from "react-mark.js";
 import {useTranslation} from "react-i18next";
 
@@ -37,17 +37,24 @@ function Items({kw, items, tokenized, setItems}) {
         const p = {
             target: ev,
             items: [
-                {
-                    key: t("rmenu-open"),
-                    name: t("rmenu-open"),
-                    onClick: () => {
-                        open_file_location(item)
-                    }
-                },
+                // {
+                //     key: t("rmenu-open"),
+                //     name: t("rmenu-open"),
+                //     onClick: () => {
+                //         open_file_location(item)
+                //     }
+                // },
                 {
                     key: t("rmenu-copy-path"),
                     name: t("rmenu-copy-path"),
                     onClick: () => copy(item.abs_path)
+                },
+                {
+                    key: t("rmenu-automation"),
+                    name: t("rmenu-automation"),
+                    onClick: () => {
+                        excel_automation(item)
+                    }
                 },
 
                 {

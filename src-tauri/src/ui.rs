@@ -95,7 +95,7 @@ async fn suggest(kw: String) -> Vec<FileView> {
 
 #[tauri::command]
 async fn search(mut kw: String, is_dir_opt: Option<bool>, ext_opt: Option<String>) -> SearchResult {
-    info!("search kw :{}, ext_opt :{:?}", kw, ext_opt);
+    info!("tauri::command-search kw :{}, ext_opt :{:?}", kw, ext_opt);
     if kw.eq("") {
         kw = "*".to_string();
     }
@@ -104,12 +104,19 @@ async fn search(mut kw: String, is_dir_opt: Option<bool>, ext_opt: Option<String
 
 #[tauri::command]
 async fn open_file_in_terminal(kw: String) {
+    info!("tauri::command-open_file_in_terminal: {}", kw);
     utils::open_file_path_in_terminal(kw.as_str());
 }
 
 #[tauri::command]
 async fn open_file_path(kw: String) {
     utils::open_file_path(kw.as_str());
+}
+
+#[tauri::command]
+async fn excel_automation_backend(file_path: String) {
+    info!("excel_automation_backend_command: {}", file_path);
+    utils::excel_automation_backend(file_path.as_str());
 }
 
 #[tauri::command]
@@ -171,6 +178,7 @@ pub fn show() {
         .invoke_handler(tauri::generate_handler![
       open_file_path,
       open_file_in_terminal,
+      excel_automation_backend,
       search,
       suggest,
       walk_metrics,

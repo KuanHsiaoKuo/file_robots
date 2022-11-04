@@ -9,7 +9,7 @@ use log4rs::append::console::ConsoleAppender;
 use log4rs::append::file::FileAppender;
 use log4rs::config::{Appender, Config, Logger, Root};
 use log4rs::encode::pattern::PatternEncoder;
-use log::LevelFilter;
+use log::{LevelFilter, info};
 
 pub fn subs(str: &str) -> Vec<String> {
     if let Ok(paths) = std::fs::read_dir(str) {
@@ -47,6 +47,17 @@ pub fn open_file_path(path: &str) {
             .output()
             .expect("failed to execute process");
     }
+}
+
+pub fn excel_automation_backend(path: &str) {
+    let curr_path = std::path::Path::new(path);
+    let arg;
+    if curr_path.is_dir() {
+        arg = curr_path.to_str().unwrap();
+    } else {
+        arg = curr_path.parent().unwrap().to_str().unwrap();
+    }
+    println!("excel_automation_backend: {}", arg);
 }
 
 pub fn open_file_path_in_terminal(path: &str) {
