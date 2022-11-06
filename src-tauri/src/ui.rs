@@ -3,6 +3,7 @@ use tauri::{App, Manager};
 use tauri::{CustomMenuItem, SystemTrayMenu};
 use tauri::{SystemTray, SystemTrayEvent};
 use tauri::{Window, Wry};
+use tauri::api::process::Command;
 
 use crate::{indexing, utils, walk_exec};
 use crate::file_view::{FileView, SearchResult};
@@ -117,6 +118,11 @@ async fn open_file_path(kw: String) {
 async fn excel_automation_backend(file_path: String) {
     info!("excel_automation_backend_command: {}", file_path);
     utils::excel_automation_backend(file_path.as_str());
+    let (mut rx, mut child) = Command::new_sidecar("excel")
+        .expect("failed to create `excel` binary command")
+        .spawn()
+        .expect("Failed to spawn sidecar");
+
 }
 
 #[tauri::command]

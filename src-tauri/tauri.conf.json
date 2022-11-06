@@ -27,7 +27,7 @@
       ],
       "resources": [
       ],
-      "externalBin": [],
+      "externalBin": ["sidecars/excel"],
       "copyright": "",
       "category": "DeveloperTool",
       "shortDescription": "",
@@ -67,6 +67,17 @@
       },
       "notification": {
         "all": true
+      },
+      "shell": {
+        "sidecar": true,
+        "scope": [
+          {
+            "name": "sidecars/excel",
+            "cmd": "sidecars/excel-x86_64-apple-darwin",
+            "args": true,
+            "sidecar": true
+          }
+        ]
       }
     },
     "windows": [
