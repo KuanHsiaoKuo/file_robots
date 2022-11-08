@@ -5,7 +5,7 @@ import {FileIconType, getFileTypeIconProps, initializeFileTypeIcons} from '@flue
 import {Icon} from "office-ui-fabric-react";
 import moment from "moment";
 import copy from "copy-to-clipboard";
-import {config_template_path, excel_automation, open_file_location_in_explorer} from "./utils";
+import {config_template_path, excel_automation, get_exist_template_configs, open_file_location_in_explorer} from "./utils";
 import {Marker} from "react-mark.js";
 import {useTranslation} from "react-i18next";
 
@@ -33,7 +33,10 @@ function Items({kw, items, tokenized, setItems}) {
         return item.key;
     }
 
-    function _onItemContextMenu(item, index, ev) {
+    async function _onItemContextMenu(item, index, ev) {
+        let exist_templates = await get_exist_template_configs();
+        let config_menu = exist_templates ? t("rmenu-config-template-again") : t("rmenu-config-template");
+        console.log(exist_templates)
         const p = {
             target: ev,
             items: [
@@ -57,8 +60,8 @@ function Items({kw, items, tokenized, setItems}) {
                     }
                 },
                 {
-                    key: t("rmenu-config-template"),
-                    name: t("rmenu-config-template"),
+                    key: config_menu,
+                    name: config_menu,
                     onClick: () => {
                         config_template_path(item)
                     }

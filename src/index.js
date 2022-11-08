@@ -56,6 +56,7 @@ let _ = i18n
                     "rmenu-open-in-explorer":"Open in Explorer",
                     "rmenu-automation": "Automation",
                     "rmenu-config-template": "Config As Template",
+                    "rmenu-config-template-again": "Config As Template Again",
                     "progress":"Progress: ",
                     "file-indexed":"File indexed: ",
                 }
@@ -91,6 +92,7 @@ let _ = i18n
                     "rmenu-copy-path":"复制路径",
                     "rmenu-automation": "自动处理",
                     "rmenu-config-template": "设置为模版",
+                    "rmenu-config-template-again": "（已经设置）重新设置模版",
                     "rmenu-open-in-terminal":"Terminal打开",
                     "rmenu-open-in-explorer":"打开所在文件夹",
                     "progress":"进度: ",

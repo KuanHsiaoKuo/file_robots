@@ -1,6 +1,6 @@
 import {invoke} from "@tauri-apps/api";
 import {isPermissionGranted, requestPermission, sendNotification} from "@tauri-apps/api/notification";
-import {BaseDirectory, createDir, writeFile, readTextFile} from "@tauri-apps/api/fs";
+import {BaseDirectory, createDir, readTextFile, writeFile} from "@tauri-apps/api/fs";
 
 const fileType2ext = {
     4: "bmp jpg gif png jpeg",
@@ -43,27 +43,34 @@ export function open_file_location_in_explorer(row) {
     });
 }
 
-export async function config_template_path(row) {
+export async function get_exist_template_configs() {
     try {
-        await createDir("data", {
-            dir: BaseDirectory.App,
-            recursive: true,
-        });
-        await writeFile(
-            {
-                contents: row.abs_path,
-                path: `data/data.json`,
-            },
-            {dir: BaseDirectory.App}
-        );
         let template_path = await readTextFile(
             `data/data.json`,
             {dir: BaseDirectory.App}
         );
-        console.log("已经设置模版地址为: " + template_path);
+        return template_path
     } catch (e) {
-        console.error(e);
+        return null
     }
+}
+
+export async function config_template_path(row) {
+    let exist_templates = await get_exist_template_configs()
+    if (!exist_templates) {
+        await createDir("data", {
+            dir: BaseDirectory.App,
+            recursive: true,
+        });
+    }
+    await writeFile(
+        {
+            contents: row.abs_path,
+            path: `data/data.json`,
+        },
+        {dir: BaseDirectory.App}
+    );
+    console.log("已经设置模版地址为: " + exist_templates);
     await send_notification('模版设置成功！', "已经设置模版地址为: " + row.abs_path);
 }
 
@@ -79,21 +86,19 @@ async function send_notification(title, body) {
 }
 
 export async function excel_automation(row) {
-    try {
-        let template_path = await readTextFile(
-            `data/data.json`,
-            {dir: BaseDirectory.App}
-        );
-        await send_notification('开始自动化处理!', '处理路径: ' + row.abs_path);
-        let execute_result =  await invoke('excel_automation_backend', {
-            // kw: row.abs_path
-            filePath: row.abs_path,
-            templatePath: template_path
-        });
-        console.log("execute_result", execute_result);
-    } catch (e) {
+    let exist_templates = await get_exist_template_configs()
+    if (!exist_templates) {
         console.error('请先设置自动化处理模版！')
         await send_notification('模版未设置！', '请先设置自动化处理模版！')
+
+    } else {
+        await send_notification('开始自动化处理!', '处理路径: ' + row.abs_path);
+        let execute_result = await invoke('excel_automation_backend', {
+            // kw: row.abs_path
+            filePath: row.abs_path,
+            templatePath: exist_templates
+        });
+        console.log("execute_result", execute_result);
     }
 }
 
