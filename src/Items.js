@@ -5,9 +5,10 @@ import {FileIconType, getFileTypeIconProps, initializeFileTypeIcons} from '@flue
 import {Icon} from "office-ui-fabric-react";
 import moment from "moment";
 import copy from "copy-to-clipboard";
-import {excel_automation, open_file_location_in_terminal, config_template_path} from "./utils";
+import {config_template_path, excel_automation, open_file_location_in_explorer} from "./utils";
 import {Marker} from "react-mark.js";
 import {useTranslation} from "react-i18next";
+
 initializeFileTypeIcons(undefined);
 
 
@@ -49,10 +50,10 @@ function Items({kw, items, tokenized, setItems}) {
                     onClick: () => copy(item.abs_path)
                 },
                 {
-                    key: t("rmenu-automation"),
-                    name: t("rmenu-automation"),
+                    key: t("rmenu-open-in-explorer"),
+                    name: t("rmenu-open-in-explorer"),
                     onClick: () => {
-                        excel_automation(item)
+                        open_file_location_in_explorer(item)
                     }
                 },
                 {
@@ -63,12 +64,20 @@ function Items({kw, items, tokenized, setItems}) {
                     }
                 },
                 {
-                    key: t("rmenu-open-in-terminal"),
-                    name: t("rmenu-open-in-terminal"),
+                    key: t("rmenu-automation"),
+                    name: t("rmenu-automation"),
                     onClick: () => {
-                        open_file_location_in_terminal(item)
+                        excel_automation(item)
                     }
                 },
+                // {
+                //     key: t("rmenu-open-in-terminal"),
+                //     name: t("rmenu-open-in-terminal"),
+                //     onClick: () => {
+                //         open_file_location_in_terminal(item)
+                //     }
+                // },
+
             ],
             onDismiss: () => {
                 setContextualMenuProps(undefined)

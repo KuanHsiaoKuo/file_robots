@@ -37,6 +37,12 @@ export function open_file_location_in_terminal(row) {
     });
 }
 
+export function open_file_location_in_explorer(row) {
+    let _ = invoke('open_file_in_explorer', {
+        kw: row.abs_path
+    });
+}
+
 export async function config_template_path(row) {
     try {
         await createDir("data", {

@@ -5,11 +5,11 @@ use std::ffi::CString;
 
 use chrono::Local;
 use directories::ProjectDirs;
+use log::{info, LevelFilter};
 use log4rs::append::console::ConsoleAppender;
 use log4rs::append::file::FileAppender;
 use log4rs::config::{Appender, Config, Logger, Root};
 use log4rs::encode::pattern::PatternEncoder;
-use log::{LevelFilter, info};
 
 pub fn subs(str: &str) -> Vec<String> {
     if let Ok(paths) = std::fs::read_dir(str) {
@@ -94,6 +94,45 @@ pub fn open_file_path_in_terminal(path: &str) {
         //open -a Terminal "/Library"
         std::process::Command::new("open")
             .args(["-a", "Terminal", arg])
+            .output()
+            .expect("failed to execute process");
+    }
+}
+
+pub fn open_file_path_in_explorer(path: &str) {
+    let curr_path = std::path::Path::new(path);
+    let arg;
+    if curr_path.is_dir() {
+        arg = curr_path.to_str().unwrap();
+    } else {
+        arg = curr_path.parent().unwrap().to_str().unwrap();
+    }
+    println!("open_file_path_in_terminal: {}", arg);
+
+    if cfg!(target_os = "windows") {
+        //cmd /K "cd C:\Windows\"
+        std::process::Command::new("cmd")
+            .args([
+                "/c",
+                "start",
+                "cmd",
+                "/K",
+                "pushd",
+                &format!("{}", win_norm4explorer(arg)),
+            ])
+            .output()
+            .expect("failed to execute process");
+    } else if cfg!(target_os = "linux") {
+        // gnome-terminal -e "bash -c command;bash"
+        std::process::Command::new("gnome-terminal")
+            .args(["-e", &format!("bash -c 'cd {}';bash", arg)])
+            .output()
+            .expect("failed to execute process");
+    } else {
+        //mac os
+        //open -a Terminal "/Library"
+        std::process::Command::new("open")
+            .args([arg])
             .output()
             .expect("failed to execute process");
     }

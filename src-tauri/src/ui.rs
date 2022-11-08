@@ -113,6 +113,12 @@ async fn open_file_in_terminal(kw: String) {
 }
 
 #[tauri::command]
+async fn open_file_in_explorer(kw: String) {
+    info!("tauri::command-open_file_in_explorer: {}", kw);
+    utils::open_file_path_in_explorer(kw.as_str());
+}
+
+#[tauri::command]
 async fn open_file_path(kw: String) {
     utils::open_file_path(kw.as_str());
 }
@@ -204,21 +210,22 @@ pub fn show() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
-      open_file_path,
-      open_file_in_terminal,
-      excel_automation_backend,
-      search,
-      suggest,
-      walk_metrics,
-      change_theme,
-      get_theme,
-      upgrade,
-      remove_exclude_path,
-      add_exclude_path,
-      change_lang,
-      get_lang,
-      reindex,
-      get_exclude_paths
+            open_file_path,
+            open_file_in_terminal,
+            open_file_in_explorer,
+            excel_automation_backend,
+            search,
+            suggest,
+            walk_metrics,
+            change_theme,
+            get_theme,
+            upgrade,
+            remove_exclude_path,
+            add_exclude_path,
+            change_lang,
+            get_lang,
+            reindex,
+            get_exclude_paths
     ])
         .system_tray(build_tray())
         .on_system_tray_event(|_, event| handle_tray_event(event))

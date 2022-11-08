@@ -53,6 +53,7 @@ let _ = i18n
                     "rmenu-open":"Open",
                     "rmenu-copy-path":"Copy Path",
                     "rmenu-open-in-terminal":"Open in Terminal",
+                    "rmenu-open-in-explorer":"Open in Explorer",
                     "rmenu-automation": "Automation",
                     "rmenu-config-template": "Config As Template",
                     "progress":"Progress: ",
@@ -91,6 +92,7 @@ let _ = i18n
                     "rmenu-automation": "自动处理",
                     "rmenu-config-template": "设置为模版",
                     "rmenu-open-in-terminal":"Terminal打开",
+                    "rmenu-open-in-explorer":"打开所在文件夹",
                     "progress":"进度: ",
                     "file-indexed":"已索引文件: ",
                 }
