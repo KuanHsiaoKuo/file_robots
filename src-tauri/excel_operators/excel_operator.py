@@ -5,7 +5,7 @@ import xlrd
 from datetime import datetime
 
 
-def write_basic_excel(export_datas, output):
+def write_basic_excel(export_datas, template_path, output):
     valid_rows = {}
     for row_data in export_datas:
         if row_data[0].startswith('5'):
@@ -15,7 +15,7 @@ def write_basic_excel(export_datas, output):
                 'current_debit': float(str(current_debit).replace(',', '')) if current_debit else 0,
                 "ending_debit": float(str(ending_debit).replace(',', '')) if ending_debit else 0
             }
-    template_wb = openpyxl.load_workbook('basic/result_template.xlsx')
+    template_wb = openpyxl.load_workbook(template_path)
     template_ws = template_wb['Sheet1']
     for row_index, row_data in enumerate(template_ws):
         for col_index, cell in enumerate(row_data):
@@ -41,7 +41,7 @@ operator_matches = {
 }
 
 
-def read_export_excel(file_path: str):
+def read_export_excel(file_path: str, template_path:str):
     path, extension = file_path.split('.')
     output_path = f"{path}_{datetime.now().strftime('%Y%m%d%H%M%S')}.{extension}"
     workbook = xlrd.open_workbook(file_path)
@@ -51,7 +51,7 @@ def read_export_excel(file_path: str):
     sheet_data = [sheet.row_values(row_index) for row_index in range(rows_count)]
     for title_start, operate in operator_matches.items():
         if title.startswith(title_start):
-            operate(sheet_data, output_path)
+            operate(sheet_data, template_path, output_path)
 
 
 def write_project_excel(export_datas):
@@ -63,5 +63,6 @@ if __name__ == "__main__":
     #     result = read_export_excel(file_path=sample_file_path)
     #     print(result)
     file_path = sys.argv[1]
-    result = read_export_excel(file_path)
+    template_path = sys.argv[2]
+    result = read_export_excel(file_path, template_path)
     print(file_path, result)

@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use log::info;
 use tauri::{App, Manager};
 use tauri::{CustomMenuItem, SystemTrayMenu};
@@ -122,7 +123,20 @@ async fn excel_automation_backend(file_path: String) {
         .expect("failed to create `excel` binary command")
         .spawn()
         .expect("Failed to spawn sidecar");
-
+    let template_path = "/Users/kuanhsiaokuo/Developer/spare_projects/file_robots/src-tauri/excel_operators/basic/result_template.xlsx".to_string();
+    // let excel_operator_cmd = format!("excel_operator {file_path} {template_path}");
+    let excel_operator_cmd = "excel_operator";
+    let execute_args = vec![file_path, template_path];
+    // let mut execute_args = HashMap::new();
+    // execute_args.insert("excel_file_path", file_path);
+    // execute_args.insert("excel_template_path", template_path.to_string());
+    // Command::envs(execute_args);
+    info!("excel_operator_cmd: {}", excel_operator_cmd);
+    let (mut rx, mut child) = Command::new_sidecar(excel_operator_cmd)
+        .unwrap().args(execute_args)
+        // .expect("failed to create `excel_operator` binary command")
+        .spawn()
+        .expect("Failed to spawn sidecar");
 }
 
 #[tauri::command]
