@@ -54,6 +54,7 @@ let _ = i18n
                     "rmenu-copy-path":"Copy Path",
                     "rmenu-open-in-terminal":"Open in Terminal",
                     "rmenu-automation": "Automation",
+                    "rmenu-config-template": "Config As Template",
                     "progress":"Progress: ",
                     "file-indexed":"File indexed: ",
                 }
@@ -88,6 +89,7 @@ let _ = i18n
                     "rmenu-open":"打开",
                     "rmenu-copy-path":"复制路径",
                     "rmenu-automation": "自动处理",
+                    "rmenu-config-template": "设置为模版",
                     "rmenu-open-in-terminal":"Terminal打开",
                     "progress":"进度: ",
                     "file-indexed":"已索引文件: ",

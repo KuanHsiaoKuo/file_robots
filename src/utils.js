@@ -1,5 +1,6 @@
 import {invoke} from "@tauri-apps/api";
 import {isPermissionGranted, requestPermission, sendNotification} from "@tauri-apps/api/notification";
+import {BaseDirectory, createDir, writeFile, readTextFile} from "@tauri-apps/api/fs";
 
 const fileType2ext = {
     4: "bmp jpg gif png jpeg",
@@ -36,16 +37,43 @@ export function open_file_location_in_terminal(row) {
     });
 }
 
-export async function excel_automation(row) {
+export async function config_template_path(row) {
+    try {
+        await createDir("data", {
+            dir: BaseDirectory.App,
+            recursive: true,
+        });
+        await writeFile(
+            {
+                contents: row.abs_path,
+                path: `data/data.json`,
+            },
+            {dir: BaseDirectory.App}
+        );
+        await readTextFile(
+            `data/data.json`,
+            {dir: BaseDirectory.App}
+        );
+        console.log("已经设置模版地址为: " + row.abs_path);
+    } catch (e) {
+        console.error(e);
+    }
+    await send_notification('模版设置成功！', "已经设置模版地址为: " + row.abs_path);
+}
+
+async function send_notification(title, body) {
     let permissionGranted = await isPermissionGranted();
     if (!permissionGranted) {
         const permission = await requestPermission();
         permissionGranted = permission === 'granted';
     }
     if (permissionGranted) {
-        sendNotification('Tauri is awesome!');
-        sendNotification({ title: 'TAURI', body: 'Tauri is awesome!' });
+        sendNotification({title: title, body: title});
     }
+}
+
+export async function excel_automation(row) {
+    await send_notification('开始自动化处理!', '处理路径: ' + row.abs_path);
     return await invoke('excel_automation_backend', {
         // kw: row.abs_path
         filePath: row.abs_path
