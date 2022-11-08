@@ -1,9 +1,11 @@
 use std::collections::HashMap;
+
 use log::info;
 use tauri::{App, Manager};
 use tauri::{CustomMenuItem, SystemTrayMenu};
 use tauri::{SystemTray, SystemTrayEvent};
 use tauri::{Window, Wry};
+use tauri::api::notification::Notification;
 use tauri::api::process::Command;
 
 use crate::{indexing, utils, walk_exec};
@@ -116,14 +118,14 @@ async fn open_file_path(kw: String) {
 }
 
 #[tauri::command]
-async fn excel_automation_backend(file_path: String) {
+async fn excel_automation_backend(file_path: String, template_path: String) {
     info!("excel_automation_backend_command: {}", file_path);
     utils::excel_automation_backend(file_path.as_str());
     let (mut rx, mut child) = Command::new_sidecar("excel")
         .expect("failed to create `excel` binary command")
         .spawn()
         .expect("Failed to spawn sidecar");
-    let template_path = "/Users/kuanhsiaokuo/Developer/spare_projects/file_robots/src-tauri/excel_operators/basic/result_template.xlsx".to_string();
+    // let template_path = "/Users/kuanhsiaokuo/Developer/spare_projects/file_robots/src-tauri/excel_operators/basic/result_template.xlsx".to_string();
     // let excel_operator_cmd = format!("excel_operator {file_path} {template_path}");
     let excel_operator_cmd = "excel_operator";
     let execute_args = vec![file_path, template_path];
@@ -190,7 +192,7 @@ fn build_tray() -> SystemTray {
 }
 
 pub fn show() {
-    tauri::Builder::default()
+    let app = tauri::Builder::default()
         .setup(|app| {
             init_window(app);
             #[cfg(debug_assertions)] // only include this code on debug builds

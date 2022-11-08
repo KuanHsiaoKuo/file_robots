@@ -50,11 +50,11 @@ export async function config_template_path(row) {
             },
             {dir: BaseDirectory.App}
         );
-        await readTextFile(
+        let template_path = await readTextFile(
             `data/data.json`,
             {dir: BaseDirectory.App}
         );
-        console.log("已经设置模版地址为: " + row.abs_path);
+        console.log("已经设置模版地址为: " + template_path);
     } catch (e) {
         console.error(e);
     }
@@ -68,16 +68,27 @@ async function send_notification(title, body) {
         permissionGranted = permission === 'granted';
     }
     if (permissionGranted) {
-        sendNotification({title: title, body: title});
+        sendNotification({title: title, body: body});
     }
 }
 
 export async function excel_automation(row) {
-    await send_notification('开始自动化处理!', '处理路径: ' + row.abs_path);
-    return await invoke('excel_automation_backend', {
-        // kw: row.abs_path
-        filePath: row.abs_path
-    });
+    try {
+        let template_path = await readTextFile(
+            `data/data.json`,
+            {dir: BaseDirectory.App}
+        );
+        await send_notification('开始自动化处理!', '处理路径: ' + row.abs_path);
+        let execute_result =  await invoke('excel_automation_backend', {
+            // kw: row.abs_path
+            filePath: row.abs_path,
+            templatePath: template_path
+        });
+        console.log("execute_result", execute_result);
+    } catch (e) {
+        console.error('请先设置自动化处理模版！')
+        await send_notification('模版未设置！', '请先设置自动化处理模版！')
+    }
 }
 
 export function open_file_location(row) {
