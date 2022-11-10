@@ -74,48 +74,62 @@ def parse_project_data(export_datas):
     balance_key = '项目余额'
     expense_sum = '支出小计'
     profit_keys = ['财政项目收入', '事业收入']
+    projects_result = {}
     for row in valid_datas:
         project = row['项目']
         class_names = re.findall(r"\[(.+)\]", row['科目'])
         cln = class_names[0] if class_names else row['摘要']
         if cln not in total_clns:
             total_clns.append(cln)
-        debt_amount = row['借方金额']
-        credit_amount = row['贷方金额']
-        if project not in statistics_data.keys():
-            statistics_data[project] = {balance_key: 0, expense_sum: 0}
-        if cln not in statistics_data[project].keys():
-            statistics_data[project][cln] = 0
-
-        statistics_data[project][cln] += debt_amount + credit_amount
-        statistics_data[project][balance_key] += debt_amount + credit_amount
-        if cln not in profit_keys:
-            statistics_data[project][expense_sum] += debt_amount + credit_amount
-        # 统一灌入剩余字段内容
-        for cell_key, cell_value in row.items():
-            if cell_key not in statistics_data[project].keys():
-                statistics_data[project][cell_key] = cell_value
+        # 1. 保存部门、项目支出小计，用于验算
+        if cln == '部门、项目小计':
+            if project not in projects_result.keys():
+                projects_result[project] = {}
+            projects_result[project]['借方金额'] = row['借方金额']
+            projects_result[project]['余额'] = row['余额']
+        else:
+            debt_amount = row['借方金额']
+            credit_amount = row['贷方金额']
+            if project not in statistics_data.keys():
+                statistics_data[project] = {balance_key: 0, expense_sum: 0}
+            if cln not in statistics_data[project].keys():
+                statistics_data[project][cln] = 0
+            # 2. 统计科目
+            statistics_data[project][cln] += debt_amount + credit_amount
+            # 3. 统计项目余额
+            statistics_data[project][balance_key] += debt_amount + credit_amount
+            # 4. 统计支出小计
+            if cln not in profit_keys:
+                statistics_data[project][expense_sum] += debt_amount + credit_amount
+            # 统一灌入剩余字段内容
+            # for cell_key, cell_value in row.items():
+            #     if cell_key not in statistics_data[project].keys():
+            #         statistics_data[project][cell_key] = cell_value
     print(total_clns)
     result_headers = ['项目', '项目分类', balance_key]
-    template_headers = ['项目', '项目分类', '财政项目收入', '事业收入', '办公费', '印刷资料费', '咨询费', '邮电费', '差旅费', '劳务费', '委托业务费', '税金', '间接费用', '其他商品和服务支出', '支出小计', balance_key]
+    # 支出小计里的数，是十项费用求和, 等于明细里面部门、项目小计的借方金额debt_amount
+    # 项目余额: 等于财政收入或事业收入减去支出小计, 核对为部门、项目小计的余额
+    template_headers = ['项目', '项目分类', '财政项目收入', '事业收入', '办公费', '印刷资料费', '咨询费', '邮电费', '差旅费', '劳务费', '委托业务费', '税金', '间接费用', '其他商品和服务支出', '支出小计',  balance_key]
     result_headers.extend(total_clns)
     result = [template_headers]
-    for key, value in statistics_data.items():
-        details = [value.get(cln, 0) for cln in template_headers]
+    for project, statistic in statistics_data.items():
+        result_debt_amount, result_balance = projects_result[project]['借方金额'], projects_result[project]['余额']
+        details = [statistic.get(cln, 0) for cln in template_headers]
+        details.extend([result_debt_amount, result_balance])
         result.append(details)
     for line in result:
         print(line)
-    return result
+    return result, projects_result
 
 
 def write_project_excel(export_datas, template_path, output_path):
-    parsed_data = parse_project_data(export_datas)
+    sum_data, projects_result = parse_project_data(export_datas)
     template_wb = openpyxl.load_workbook(template_path)
     template_ws = template_wb['项目']
     # template_wb = openpyxl.Workbook()
     # template_ws = template_wb.active
     # template_ws.title = "项目收支统计表"
-    for row in parsed_data:
+    for row in sum_data:
         template_ws.append(row)
     template_wb.save(filename=output_path)
     print(f"{template_ws.title}保存在{output_path}")
