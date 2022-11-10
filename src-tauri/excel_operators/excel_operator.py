@@ -72,6 +72,8 @@ def parse_project_data(export_datas):
     statistics_data = {}
     total_clns = []
     balance_key = '项目余额'
+    expense_sum = '支出小计'
+    profit_keys = ['财政项目收入', '事业收入']
     for row in valid_datas:
         project = row['项目']
         class_names = re.findall(r"\[(.+)\]", row['科目'])
@@ -81,22 +83,25 @@ def parse_project_data(export_datas):
         debt_amount = row['借方金额']
         credit_amount = row['贷方金额']
         if project not in statistics_data.keys():
-            statistics_data[project] = {balance_key: 0}
+            statistics_data[project] = {balance_key: 0, expense_sum: 0}
         if cln not in statistics_data[project].keys():
             statistics_data[project][cln] = 0
 
         statistics_data[project][cln] += debt_amount + credit_amount
         statistics_data[project][balance_key] += debt_amount + credit_amount
+        if cln not in profit_keys:
+            statistics_data[project][expense_sum] += debt_amount + credit_amount
         # 统一灌入剩余字段内容
         for cell_key, cell_value in row.items():
             if cell_key not in statistics_data[project].keys():
                 statistics_data[project][cell_key] = cell_value
     print(total_clns)
     result_headers = ['项目', '项目分类', balance_key]
+    template_headers = ['项目', '项目分类', '财政项目收入', '事业收入', '办公费', '印刷资料费', '咨询费', '邮电费', '差旅费', '劳务费', '委托业务费', '税金', '间接费用', '其他商品和服务支出', '支出小计', balance_key]
     result_headers.extend(total_clns)
-    result = [result_headers]
+    result = [template_headers]
     for key, value in statistics_data.items():
-        details = [value.get(cln, 0) for cln in result_headers]
+        details = [value.get(cln, 0) for cln in template_headers]
         result.append(details)
     for line in result:
         print(line)
