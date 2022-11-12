@@ -92,13 +92,14 @@ async function send_notification(title, body) {
     }
 }
 
-export async function excel_automation(row) {
-    let exist_templates = await get_exist_template_configs()
+export async function excel_automation(row, type) {
+    let exist_templates = await get_exist_template_configs(type)
     if (!exist_templates) {
         console.error('请先设置自动化处理模版！')
         await send_notification('模版未设置！', '请先设置自动化处理模版！')
 
     } else {
+        console.log(row.abs_path, exist_templates)
         await send_notification('开始自动化处理!', '处理路径: ' + row.abs_path);
         let execute_result = await invoke('excel_automation_backend', {
             // kw: row.abs_path

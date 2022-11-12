@@ -83,14 +83,14 @@ function Items({kw, items, tokenized, setItems}) {
                     key: t("rmenu-automation-basic_expense"),
                     name: t("rmenu-automation-basic_expense"),
                     onClick: () => {
-                        excel_automation(item)
+                        excel_automation(item, 'basic')
                     }
                 },
                 {
                     key: t("rmenu-automation-project_statistic"),
                     name: t("rmenu-automation-project_statistic"),
                     onClick: () => {
-                        excel_automation(item)
+                        excel_automation(item, 'project')
                     }
                 },
                 // {
