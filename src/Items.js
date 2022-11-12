@@ -34,9 +34,15 @@ function Items({kw, items, tokenized, setItems}) {
     }
 
     async function _onItemContextMenu(item, index, ev) {
-        let exist_templates = await get_exist_template_configs();
-        let config_menu = exist_templates ? t("rmenu-config-template-again") : t("rmenu-config-template");
-        console.log(exist_templates)
+        let basic_config_menu =
+            await get_exist_template_configs('basic') ?
+                t("rmenu-config-template-basic_expense-again") :
+                t("rmenu-config-template-basic_expense");
+        let project_config_menu =
+            await get_exist_template_configs('project') ?
+                t("rmenu-config-template-project_statistic-again") :
+                t("rmenu-config-template-project_statistic");
+        console.log(basic_config_menu, project_config_menu)
         const p = {
             target: ev,
             items: [
@@ -60,15 +66,29 @@ function Items({kw, items, tokenized, setItems}) {
                     }
                 },
                 {
-                    key: config_menu,
-                    name: config_menu,
+                    key: basic_config_menu,
+                    name: basic_config_menu,
                     onClick: () => {
-                        config_template_path(item)
+                        config_template_path(item, 'basic')
                     }
                 },
                 {
-                    key: t("rmenu-automation"),
-                    name: t("rmenu-automation"),
+                    key: project_config_menu,
+                    name: project_config_menu,
+                    onClick: () => {
+                        config_template_path(item, 'project')
+                    }
+                },
+                {
+                    key: t("rmenu-automation-basic_expense"),
+                    name: t("rmenu-automation-basic_expense"),
+                    onClick: () => {
+                        excel_automation(item)
+                    }
+                },
+                {
+                    key: t("rmenu-automation-project_statistic"),
+                    name: t("rmenu-automation-project_statistic"),
                     onClick: () => {
                         excel_automation(item)
                     }

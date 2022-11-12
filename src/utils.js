@@ -43,10 +43,15 @@ export function open_file_location_in_explorer(row) {
     });
 }
 
-export async function get_exist_template_configs() {
+const TEMPLATE_PATHS = {
+    "basic": 'data/basic_expense_template.json',
+    "project": 'data/project_statistic_template.json'
+}
+
+export async function get_exist_template_configs(type) {
     try {
         let template_path = await readTextFile(
-            `data/data.json`,
+            TEMPLATE_PATHS[type],
             {dir: BaseDirectory.App}
         );
         return template_path
@@ -55,22 +60,24 @@ export async function get_exist_template_configs() {
     }
 }
 
-export async function config_template_path(row) {
-    let exist_templates = await get_exist_template_configs()
+export async function config_template_path(row, type) {
+    let exist_templates = await get_exist_template_configs(type)
     if (!exist_templates) {
         await createDir("data", {
             dir: BaseDirectory.App,
             recursive: true,
         });
     }
+    console.log(row, type)
     await writeFile(
         {
             contents: row.abs_path,
-            path: `data/data.json`,
+            path: TEMPLATE_PATHS[type],
         },
         {dir: BaseDirectory.App}
     );
-    console.log("已经设置模版地址为: " + exist_templates);
+    let new_templates = await get_exist_template_configs(type)
+    console.log("已经设置模版地址为: " + new_templates);
     await send_notification('模版设置成功！', "已经设置模版地址为: " + row.abs_path);
 }
 
