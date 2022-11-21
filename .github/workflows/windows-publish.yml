@@ -2,7 +2,7 @@ name: "publish"
 on:
   push:
     branches:
-      - windows-release
+      - windows-release-test
 
 jobs:
   publish-tauri:
