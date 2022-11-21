@@ -28,7 +28,6 @@
       "resources": [
       ],
       "externalBin": [
-        "sidecars/excel",
         "sidecars/excel_operator"
       ],
       "copyright": "",
