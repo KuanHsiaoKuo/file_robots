@@ -81,12 +81,6 @@
         "sidecar": true,
         "scope": [
           {
-            "name": "sidecars/excel",
-            "cmd": "sidecars/excel-x86_64-apple-darwin",
-            "args": true,
-            "sidecar": true
-          },
-          {
             "name": "sidecars/excel_operator",
             "cmd": "sidecars/excel_operator-x86_64-apple-darwin",
             "args": true,
