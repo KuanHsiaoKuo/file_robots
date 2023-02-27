@@ -1,33 +1,38 @@
-import re
-import sys
-from datetime import datetime
 import openpyxl
+import re
 import xlrd
+from datetime import datetime
 
 
 def write_basic_excel(export_datas, template_path, output):
     valid_rows = {}
     for row_data in export_datas:
         if row_data[0].startswith('5'):
-            num, title, _, _, current_debit, _, ending_debit, _ = row_data
+            num, title, _, _, current_debit, ending_debit, _, _ = row_data
             valid_rows[num] = {
                 "title": title,
+                # 本期贷方数
                 'current_debit': float(str(current_debit).replace(',', '')) if current_debit else 0,
+                # 本期借方数
                 "ending_debit": float(str(ending_debit).replace(',', '')) if ending_debit else 0
             }
     template_wb = openpyxl.load_workbook(template_path)
     template_ws = template_wb['Sheet1']
+    target_key = "ending_debit"
     for row_index, row_data in enumerate(template_ws):
         for col_index, cell in enumerate(row_data):
             if isinstance(cell.value, str) or isinstance(cell.value, int):
                 cell_value = str(cell.value)
                 try:
                     if "+" in cell_value and cell_value.startswith('5'):
-                        total_list = [valid_rows[seg]['ending_debit'] for seg in cell_value.split("+")]
+                        total_list = [valid_rows[seg][target_key] for seg in cell_value.split("+")]
                         total = sum(total_list)
-                        cell.value = total
+                        # 转为万元
+                        cell.value = float("%.2f" % (total / 10000)) if total else 0
                     elif cell_value.startswith('5'):
-                        cell.value = valid_rows[cell_value]['ending_debit']
+                        cell.value = float("%.2f" % (valid_rows[cell_value][target_key] / 10000)) if valid_rows[cell_value][target_key] else 0
+                    elif cell_value == "xxx":
+                        cell.value = 0
                 except Exception as e:
                     print(e.args[0])
                     print(cell.value)
@@ -108,7 +113,7 @@ def parse_project_data(export_datas):
     result_headers = ['项目', '项目分类', balance_key]
     # 支出小计里的数，是十项费用求和, 等于明细里面部门、项目小计的借方金额debt_amount
     # 项目余额: 等于财政收入或事业收入减去支出小计, 核对为部门、项目小计的余额
-    template_headers = ['项目', '项目分类', '财政项目收入', '事业收入', '办公费', '印刷资料费', '咨询费', '邮电费', '差旅费', '劳务费', '委托业务费', '税金', '间接费用', '其他商品和服务支出', '支出小计',  balance_key]
+    template_headers = ['项目', '项目分类', '财政项目收入', '事业收入', '办公费', '印刷资料费', '咨询费', '邮电费', '差旅费', '劳务费', '委托业务费', '税金', '间接费用', '其他商品和服务支出', '支出小计', balance_key]
     result_headers.extend(total_clns)
     result = [template_headers]
     for project, statistic in statistics_data.items():
@@ -161,7 +166,8 @@ if __name__ == "__main__":
     #     sample_file_path = 'basic/sample_export.xls'
     #     result = read_export_excel(file_path=sample_file_path)
     #     print(result)
-    file_path = sys.argv[1]
-    template_path = sys.argv[2]
+    # file_path = sys.argv[1]
+    # template_path = sys.argv[2]
+    file_path, template_path = "basic/费用.xls", "basic/result_template.xlsx"
     result = read_export_excel(file_path, template_path)
     print(file_path, result)
