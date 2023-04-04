@@ -2,6 +2,7 @@ import openpyxl
 import re
 import xlrd
 from datetime import datetime
+from openpyxl.styles import Alignment, Border, Side
 
 
 def write_basic_excel(export_datas, template_path, output):
@@ -30,7 +31,7 @@ def write_basic_excel(export_datas, template_path, output):
                         # 转为万元
                         cell.value = float("%.2f" % (total / 10000)) if total else 0
                     elif cell_value.startswith('5'):
-                        cell.value = float("%.2f" % (valid_rows[cell_value][target_key] / 10000)) if valid_rows[cell_value][target_key] else 0
+                        cell.value = float("%.2f" % (valid_rows[cell_value][target_key] / 10000)) if valid_rows[cell_value][target_key] > 0 else 0
                     elif cell_value == "xxx":
                         cell.value = 0
                 except Exception as e:
@@ -143,6 +144,13 @@ def parse_project_data(export_datas):
 
 
 def write_project_excel(export_datas, template_path, output_path):
+    align = Alignment(horizontal='center', vertical='center')
+    # 边框样式
+    border = Border(left=Side(border_style='thin'),
+                    right=Side(border_style='thin'),
+                    top=Side(border_style='thin'),
+                    bottom=Side(border_style='thin'))
+
     sum_data, projects_result = parse_project_data(export_datas)
     template_wb = openpyxl.load_workbook(template_path)
     template_ws = template_wb['项目']
@@ -151,6 +159,18 @@ def write_project_excel(export_datas, template_path, output_path):
     # template_ws.title = "项目收支统计表"
     for row in sum_data[1:]:
         template_ws.append(row)
+    max_rows = template_ws.max_row  # 获取最大行
+    max_cols = template_ws.max_column
+    for row in range(2, max_rows + 1):
+        if row == max_rows:
+            template_ws.cell(row, 1).alignment = align  # 将最后一行首个空格居中: "合计"
+        else:
+            template_ws.cell(row, 2).alignment = align  # 将每行第二个空格居中
+        for col in range(1, max_cols + 1):
+            template_ws.cell(row, col).border = border  # 每一格添加边框
+            # if col > 2:
+            #     template_ws.cell(row, col).number_format = '_(* #,##0.00_);_(* (#,##0.00);_(* "-"??_);_(@_)'
+
     template_wb.save(filename=output_path)
     print(f"{template_ws.title}保存在{output_path}")
 
