@@ -109,6 +109,10 @@ pyinstaller --onefile excel_operator.py
 
 2. 将dist/excel_operator放入sidecar文件夹，需要额外复制一个执行文件：
 
+```shell
+cp excel_operator/dist/excel_operator sidecar/excel_operator-x86_64-pc-windows-msvc.exe
+```
+
 > tauri主要根据后缀来判断在不同平台执行哪个文件
 
 ```shell
