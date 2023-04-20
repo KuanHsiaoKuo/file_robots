@@ -372,3 +372,4 @@ fabric.properties
 bin
 .DS_Store
 *.xls*
+*/*/project_venv/*
