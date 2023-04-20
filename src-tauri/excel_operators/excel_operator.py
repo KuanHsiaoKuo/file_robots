@@ -1,33 +1,39 @@
-import re
-import sys
-from datetime import datetime
 import openpyxl
+import re
 import xlrd
+from datetime import datetime
+from openpyxl.styles import Alignment, Border, Side
 
 
 def write_basic_excel(export_datas, template_path, output):
     valid_rows = {}
     for row_data in export_datas:
         if row_data[0].startswith('5'):
-            num, title, _, _, current_debit, _, ending_debit, _ = row_data
+            num, title, _, _, current_debit, ending_debit, _, _ = row_data
             valid_rows[num] = {
                 "title": title,
+                # 本期贷方数
                 'current_debit': float(str(current_debit).replace(',', '')) if current_debit else 0,
+                # 本期借方数
                 "ending_debit": float(str(ending_debit).replace(',', '')) if ending_debit else 0
             }
     template_wb = openpyxl.load_workbook(template_path)
     template_ws = template_wb['Sheet1']
+    target_key = "ending_debit"
     for row_index, row_data in enumerate(template_ws):
         for col_index, cell in enumerate(row_data):
             if isinstance(cell.value, str) or isinstance(cell.value, int):
                 cell_value = str(cell.value)
                 try:
                     if "+" in cell_value and cell_value.startswith('5'):
-                        total_list = [valid_rows[seg]['ending_debit'] for seg in cell_value.split("+")]
+                        total_list = [valid_rows[seg][target_key] for seg in cell_value.split("+")]
                         total = sum(total_list)
-                        cell.value = total
+                        # 转为万元
+                        cell.value = float("%.2f" % (total / 10000)) if total else 0
                     elif cell_value.startswith('5'):
-                        cell.value = valid_rows[cell_value]['ending_debit']
+                        cell.value = float("%.2f" % (valid_rows[cell_value][target_key] / 10000)) if valid_rows[cell_value][target_key] > 0 else 0
+                    elif cell_value == "xxx":
+                        cell.value = 0
                 except Exception as e:
                     print(e.args[0])
                     print(cell.value)
@@ -54,7 +60,7 @@ def parse_project_data(export_datas):
             if not data[amount_key]:
                 data[amount_key] = 0
             else:
-                data[amount_key] = float(data[amount_key].replace(',', ''))
+                data[amount_key] = float(str(data[amount_key]).replace(',', ''))
         invalid_conditions = [
             data['项目分类'] in exclude_category,
             not data['项目']
@@ -85,8 +91,10 @@ def parse_project_data(export_datas):
             if project not in projects_result.keys():
                 projects_result[project] = {}
             projects_result[project]['借方金额'] = row['借方金额']
+            projects_result[project]['贷方金额'] = row['贷方金额']
             projects_result[project]['余额'] = row['余额']
         else:
+            classify = re.findall(r"\[(.+)\]", row['项目分类'])[0]
             debt_amount = row['借方金额']
             credit_amount = row['贷方金额']
             if project not in statistics_data.keys():
@@ -95,41 +103,74 @@ def parse_project_data(export_datas):
                 statistics_data[project][cln] = 0
             # 2. 统计科目
             statistics_data[project][cln] += debt_amount + credit_amount
-            # 3. 统计项目余额
-            statistics_data[project][balance_key] += debt_amount + credit_amount
             # 4. 统计支出小计
             if cln not in profit_keys:
                 statistics_data[project][expense_sum] += debt_amount + credit_amount
+            # 5. 添加项目分类、项目名称
+            statistics_data[project]['项目分类'] = classify
+            statistics_data[project]['项目'] = project
             # 统一灌入剩余字段内容
             # for cell_key, cell_value in row.items():
             #     if cell_key not in statistics_data[project].keys():
             #         statistics_data[project][cell_key] = cell_value
     print(total_clns)
     result_headers = ['项目', '项目分类', balance_key]
+    total_headers = ['财政项目收入', '事业收入', '办公费', '印刷资料费', '咨询费', '邮电费', '差旅费', '劳务费', '委托业务费', '税金', '间接费用', '其他商品和服务支出', '支出小计', balance_key]
     # 支出小计里的数，是十项费用求和, 等于明细里面部门、项目小计的借方金额debt_amount
     # 项目余额: 等于财政收入或事业收入减去支出小计, 核对为部门、项目小计的余额
-    template_headers = ['项目', '项目分类', '财政项目收入', '事业收入', '办公费', '印刷资料费', '咨询费', '邮电费', '差旅费', '劳务费', '委托业务费', '税金', '间接费用', '其他商品和服务支出', '支出小计',  balance_key]
+    template_headers = ['项目', '项目分类', '财政项目收入', '事业收入', '办公费', '印刷资料费', '咨询费', '邮电费', '差旅费', '劳务费', '委托业务费', '税金', '间接费用', '其他商品和服务支出', '支出小计', balance_key]
     result_headers.extend(total_clns)
     result = [template_headers]
     for project, statistic in statistics_data.items():
-        result_debt_amount, result_balance = projects_result[project]['借方金额'], projects_result[project]['余额']
+        # 统计项目余额
+        # 项目余额=财政项目收入（或事业收入）-支出小计
+        statistic[balance_key] += statistic.get('事业收入', 0) + statistic.get('财政项目收入', 0) - statistic['支出小计']
+        # 验算一下
+        verify_results = projects_result[project]['贷方金额'] - projects_result[project]['借方金额']
+        if abs(verify_results - statistic[balance_key]) > 0.01:
+            print(f"{project} 余额不符: {verify_results}, {statistic[balance_key]}")
         details = [statistic.get(cln, 0) for cln in template_headers]
-        details.extend([result_debt_amount, result_balance])
+        # 部门、项目小计（借方余额、余额）
+        # result_debt_amount, result_balance = projects_result[project]['借方金额'], projects_result[project]['余额']
+        # details.extend([result_debt_amount, result_balance])
         result.append(details)
-    for line in result:
-        print(line)
+    total = ['合计', '']
+    for header in total_headers:
+        total.append(sum([statistic.get(header, 0) for statistic in statistics_data.values()]))
+    result.append(total)
+    # for line in result:
+    #     print(line)
     return result, projects_result
 
 
 def write_project_excel(export_datas, template_path, output_path):
+    align = Alignment(horizontal='center', vertical='center')
+    # 边框样式
+    border = Border(left=Side(border_style='thin'),
+                    right=Side(border_style='thin'),
+                    top=Side(border_style='thin'),
+                    bottom=Side(border_style='thin'))
+
     sum_data, projects_result = parse_project_data(export_datas)
     template_wb = openpyxl.load_workbook(template_path)
     template_ws = template_wb['项目']
     # template_wb = openpyxl.Workbook()
     # template_ws = template_wb.active
     # template_ws.title = "项目收支统计表"
-    for row in sum_data:
+    for row in sum_data[1:]:
         template_ws.append(row)
+    max_rows = template_ws.max_row  # 获取最大行
+    max_cols = template_ws.max_column
+    for row in range(2, max_rows + 1):
+        if row == max_rows:
+            template_ws.cell(row, 1).alignment = align  # 将最后一行首个空格居中: "合计"
+        else:
+            template_ws.cell(row, 2).alignment = align  # 将每行第二个空格居中
+        for col in range(1, max_cols + 1):
+            template_ws.cell(row, col).border = border  # 每一格添加边框
+            # if col > 2:
+            #     template_ws.cell(row, col).number_format = '_(* #,##0.00_);_(* (#,##0.00);_(* "-"??_);_(@_)'
+
     template_wb.save(filename=output_path)
     print(f"{template_ws.title}保存在{output_path}")
 
@@ -161,7 +202,10 @@ if __name__ == "__main__":
     #     sample_file_path = 'basic/sample_export.xls'
     #     result = read_export_excel(file_path=sample_file_path)
     #     print(result)
-    file_path = sys.argv[1]
-    template_path = sys.argv[2]
+    # file_path = sys.argv[1]
+    # template_path = sys.argv[2]
+    # file_path, template_path = "basic/费用.xls", "basic/result_template.xlsx"
+    file_path, template_path = "projects/社会课题2022.xls", "projects/result_template.xlsx"
+
     result = read_export_excel(file_path, template_path)
     print(file_path, result)

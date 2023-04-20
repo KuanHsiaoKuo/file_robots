@@ -128,14 +128,15 @@ async fn excel_automation_backend(file_path: String, template_path: String) {
     info!("excel_automation_backend_command-file_path: {}", file_path);
     info!("excel_automation_backend_command-template_path: {}", template_path);
     utils::excel_automation_backend(file_path.as_str());
-    let (mut rx, mut child) = Command::new_sidecar("excel")
-        .expect("failed to create `excel` binary command")
-        .spawn()
-        .expect("Failed to spawn sidecar");
-    // let template_path = "/Users/kuanhsiaokuo/Developer/spare_projects/file_robots/src-tauri/excel_operators/basic/result_template.xlsx".to_string();
+    // let (mut rx, mut child) = Command::new_sidecar("excel")
+    //     .expect("failed to create `excel` binary command")
+    //     .spawn()
+    //     .expect("Failed to spawn sidecar");
+    let template_path = "/Users/kuanhsiaokuo/Developer/spare_projects/file_robots/src-tauri/excel_operators/basic/result_template.xlsx".to_string();
     // let excel_operator_cmd = format!("excel_operator {file_path} {template_path}");
     let excel_operator_cmd = "excel_operator";
-    let execute_args = vec![file_path, template_path];
+    // let execute_args = vec![file_path, template_path];
+    let execute_args = vec![file_path, template_path.to_string()];
     // let mut execute_args = HashMap::new();
     // execute_args.insert("excel_file_path", file_path);
     // execute_args.insert("excel_template_path", template_path.to_string());
